@@ -23,5 +23,7 @@ package org.sourcei.clime.utils.reusables
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
  */
-const val LOCATION = "location"
-const val LOCATION_NAME = "locationName"
+const val PLACE ="place"
+const val TEMPERATURE ="temperature"
+const val WEATHER ="weather"
+const val ICON ="icon"

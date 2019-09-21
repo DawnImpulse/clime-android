@@ -33,7 +33,10 @@ import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.F
 import org.sourcei.clime.utils.functions.loge
+import org.sourcei.clime.utils.functions.setGradient
 import org.sourcei.clime.utils.functions.toast
+import org.sourcei.clime.utils.reusables.Angles
+import org.sourcei.clime.utils.reusables.Gradients
 
 /**
  * @info -
@@ -53,6 +56,10 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place)
 
+        // set background gradient
+        placeBg.setGradient(Gradients.getRandomGradient(), 0, Angles.random().toFloat())
+
+        // init places autocomplete
         placesClient = Places.createClient(this)
         autocompleteFragment = searchPlace as AutocompleteSupportFragment
         autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))

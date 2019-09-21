@@ -68,7 +68,7 @@ object F {
                 .joinToString("")
     }
 
-    //connection listener
+    // connection listener
     fun isConnected(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -98,6 +98,7 @@ object F {
 
     // get location
     fun getLocation(context: Context, callback: (LatLng?) -> Unit) {
+        var update = false
 
         // location callback
         val locationCallback = object : LocationCallback() {
@@ -105,10 +106,14 @@ object F {
                 super.onLocationResult(location)
 
                 DialogHandler.dismiss()
-                if (location != null) {
-                    callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
-                } else
-                    callback(null)
+                if (update) {
+                    if (location != null) {
+                        callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
+                    } else
+                        callback(null)
+                }
+
+                update = false
             }
         }
 
@@ -118,10 +123,44 @@ object F {
             if (it != null) {
                 callback(LatLng(it.latitude, it.longitude))
             } else {
-                DialogHandler.progress(context)
+                DialogHandler.progress(context) {
+                    update = false
+                    callback(null)
+                }
                 fusedLocationProviderClient.requestLocationUpdates(LocationRequest().setNumUpdates(1), locationCallback, Looper.getMainLooper())
             }
         }
+    }
+
+    // get current location
+    fun getCurrentLocation(context: Context, callback: (LatLng?) -> Unit) {
+        var update = true
+
+        // location callback
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(location: LocationResult?) {
+                super.onLocationResult(location)
+
+                DialogHandler.dismiss()
+                if (update) {
+                    if (location != null) {
+                        callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
+                    } else
+                        callback(null)
+                }
+
+                update = false
+            }
+        }
+
+
+        DialogHandler.progress(context) {
+            update = false
+            callback(null)
+        }
+
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedLocationProviderClient.requestLocationUpdates(LocationRequest().setNumUpdates(1), locationCallback, Looper.getMainLooper())
     }
 
     // convert K -> C
@@ -132,6 +171,30 @@ object F {
     // convert K -> F
     fun toFarenheit(temp: Float): Float {
         return ((temp - 273) * 1.8 + 32).round(1).toFloat()
+    }
+
+    // search term for wallpaper
+    fun getSearchTerm(icon: String): String {
+        return when (icon) {
+            "01d" -> "clear sky"
+            "01n" -> "night sky"
+            "02d" -> "clouds"
+            "02n" -> "night clouds"
+            "03d" -> "clouds"
+            "03n" -> "night clouds"
+            "04d" -> "clouds"
+            "04n" -> "night clouds"
+            "09d" -> "rain"
+            "09n" -> "rain night"
+            "10d" -> "rain"
+            "10n" -> "rain night"
+            "11d" -> "thunderstorm"
+            "11n" -> "thunderstorm"
+            "13d" -> "snow day"
+            "13n" -> "snow night"
+            "50d" -> "mist"
+            else -> "mist night"
+        }
     }
 
 }

@@ -20,16 +20,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
+import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.network.Model
 import org.sourcei.clime.utils.functions.*
-import org.sourcei.clime.utils.reusables.Angles
-import org.sourcei.clime.utils.reusables.Gradients
-import org.sourcei.clime.utils.reusables.LOCATION
-import org.sourcei.clime.utils.reusables.Prefs
+import org.sourcei.clime.utils.reusables.*
 
 /**
  * @info -
@@ -40,7 +39,8 @@ import org.sourcei.clime.utils.reusables.Prefs
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
  */
-class ActivityMain : AppCompatActivity() {
+@SuppressLint("SetTextI18n")
+class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var location: LatLng
     private lateinit var model: Model
 
@@ -50,18 +50,16 @@ class ActivityMain : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         model = Model(this)
+        swipe.isRefreshing = true
 
-        if (!Prefs.contains(LOCATION)) {
-            F.getLocation(this) {
-                if (it != null) {
-                    location = it
-                    setData()
-                } else
-                    startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
-            }
-        }
+        dataHandling()
+        if (Prefs.contains(WEATHER))
+            setAvailableData()
+
+        swipe.setOnRefreshListener(this)
     }
 
+    // set activity result (for location)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -70,26 +68,85 @@ class ActivityMain : AppCompatActivity() {
                 val location = Gson().fromJson(data!!.data.toString(), LatLng::class.java)
                 this.location = location
                 setData()
-            } else
+            } else {
                 toast("unable to get location, kindly provide your location in Settings", Toast.LENGTH_LONG)
+                swipe.isRefreshing = false
+            }
+        }
+    }
+
+    // swipe refresh listener
+    override fun onRefresh() {
+        swipe.isRefreshing = true
+        dataHandling(true)
+    }
+
+    // handle stored data / ask for location & data
+    private fun dataHandling(current: Boolean = false) {
+        Permissions.askAccessCoarseLocationPermission(this) { e, r ->
+            e?.let {
+                toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
+                swipe.isRefreshing = false
+            }
+            r?.let {
+
+                fun handling(latLng: LatLng?) {
+                    if (latLng != null) {
+                        location = latLng
+                        logd(location.toString())
+                        setData()
+                    } else
+                        startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
+                }
+
+                if (current)
+                    F.getCurrentLocation(this) { handling(it) }
+                else
+                    F.getLocation(this) { handling(it) }
+            }
         }
     }
 
     // set new data
-    @SuppressLint("SetTextI18n")
-    fun setData() {
+    private fun setData() {
         model.getWeatherCoordinates(location.latitude, location.longitude) { e, r ->
             e?.let {
                 toast(it.toString())
                 loge(it)
+                swipe.isRefreshing = false
             }
             r?.let {
-                place.text = "${it.name}, ${it.sys.country}"
-                temperature.text = "${F.toCelsius(it.main.temp.toFloat())}°C"
-                weather.text = it.weather[0].description.toCamelCase()
+                val p = "${it.name}, ${it.sys.country}"
+                val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                val w = it.weather[0].description.toCamelCase()
+
+
+                place.text = p
+                temperature.text = t
+                weather.text = w
+
+                Prefs.putAny(PLACE, p)
+                Prefs.putAny(WEATHER, w)
+                Prefs.putAny(TEMPERATURE, t)
+                Prefs.putAny(ICON, it.weather[0].icon)
 
                 gradient.setGradient(Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(), 0, Angles.random().toFloat())
+                swipe.isRefreshing = false
             }
         }
+    }
+
+    // set stored data
+    private fun setAvailableData() {
+        val p = Prefs.getString(PLACE, "")!!
+        val t = Prefs.getString(TEMPERATURE, "")!!
+        val w = Prefs.getString(WEATHER, "")!!
+        val i = Prefs.getString(ICON, "")!!
+
+        place.text = p
+        temperature.text = t
+        weather.text = w
+
+        gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
     }
 }

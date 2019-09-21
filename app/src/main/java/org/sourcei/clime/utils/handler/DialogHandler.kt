@@ -49,14 +49,24 @@ object DialogHandler {
     }
 
     // indeterminate progress bar
-    fun progress(context: Context) {
-        alertDialog = AlertDialog.Builder(context).create()
+    fun progress(context: Context, callback: () -> Unit) {
+        val builder = AlertDialog.Builder(context)
+        builder.setNegativeButton("CANCEL") { dialog, _ ->
+            dialog.dismiss()
+            callback()
+        }
+
+        alertDialog = builder.create()
         alertDialog.setView(LayoutInflater.from(context).inflate(R.layout.inflator_progress_dialog, null))
         alertDialog.show()
     }
 
     // dismiss
     fun dismiss() {
-        alertDialog.dismiss()
+        try {
+            alertDialog.dismiss()
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
     }
 }

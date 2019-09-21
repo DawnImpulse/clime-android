@@ -18,6 +18,11 @@ OR PERFORMANCE OF THIS SOFTWARE.
     android:background="@color/white"
     android:orientation="vertical">
 
+    <FrameLayout
+        android:id="@+id/placeBg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <!--Auto complete-->
     <fragment
         android:id="@+id/searchPlace"

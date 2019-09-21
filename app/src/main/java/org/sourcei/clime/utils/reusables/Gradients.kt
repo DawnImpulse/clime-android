@@ -35,7 +35,7 @@ object Gradients {
     }
 
     // all gradients
-    private fun allGradients(): Map<String, List<String>> {
+    fun allGradients(): Map<String, List<String>> {
 
         val map = mutableMapOf<String, List<String>>()
 
@@ -60,6 +60,14 @@ object Gradients {
         map["50n"] = listOf("#ED4264", "#FFEDBC")
 
         return map
+    }
+
+    // get a random gradient
+    fun getRandomGradient(): IntArray {
+        val map = allGradients()
+        val keys = map.keys.toList()
+
+        return map[keys.random()]!!.map { it.toColorInt() }.toIntArray()
     }
 
 }
