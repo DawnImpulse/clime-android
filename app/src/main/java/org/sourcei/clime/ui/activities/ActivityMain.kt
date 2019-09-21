@@ -17,6 +17,7 @@ package org.sourcei.clime.ui.activities
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -28,7 +29,10 @@ import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.network.Model
 import org.sourcei.clime.utils.functions.*
+import org.sourcei.clime.utils.handler.ImageHandler
+import org.sourcei.clime.utils.handler.StorageHandler
 import org.sourcei.clime.utils.reusables.*
+import java.io.File
 
 /**
  * @info -
@@ -43,6 +47,7 @@ import org.sourcei.clime.utils.reusables.*
 class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
     private lateinit var location: LatLng
     private lateinit var model: Model
+    private var bitmap: Bitmap? = null
 
     // on create
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -132,6 +137,19 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
                 gradient.setGradient(Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(), 0, Angles.random().toFloat())
                 swipe.isRefreshing = false
+
+                // set image
+                ImageHandler.getBitmap(bitmap, this) {
+                    if (it != null) {
+                        bitmap = it
+                        image.setImageBitmap(it)
+                        image.show()
+                        mask.show()
+
+                        // save bitmap in temp directory
+                        StorageHandler.storeBitmapInFile(it, File(cacheDir, "homescreen.jpg"))
+                    }
+                }
             }
         }
     }
@@ -148,5 +166,11 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         weather.text = w
 
         gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
+        if (File(cacheDir, "homescreen.jpg").exists()) {
+            bitmap = StorageHandler.getBitmapFromFile(File(cacheDir, "homescreen.jpg"))
+            image.setImageBitmap(bitmap)
+            image.show()
+            mask.show()
+        }
     }
 }

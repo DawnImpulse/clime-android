@@ -141,7 +141,6 @@ object F {
             override fun onLocationResult(location: LocationResult?) {
                 super.onLocationResult(location)
 
-                DialogHandler.dismiss()
                 if (update) {
                     if (location != null) {
                         callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
@@ -151,12 +150,6 @@ object F {
 
                 update = false
             }
-        }
-
-
-        DialogHandler.progress(context) {
-            update = false
-            callback(null)
         }
 
         val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)

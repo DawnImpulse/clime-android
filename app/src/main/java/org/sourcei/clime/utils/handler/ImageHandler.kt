@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.sourcei.clime.utils.functions.F
+import org.sourcei.clime.utils.reusables.ICON
 import org.sourcei.clime.utils.reusables.Prefs
 
 /**
@@ -38,10 +39,12 @@ object ImageHandler {
     // get bitmap
     fun getBitmap(bitmap: Bitmap?, context: Context, callback: (Bitmap?) -> Unit) {
 
+        val searchTerm = F.getSearchTerm(Prefs.getString(ICON, "01d")!!)
+
         GlobalScope.launch {
             val future = Glide.with(context)
                     .asBitmap()
-                    .load("https://source.unsplash.com/random/1440x3040/?${Prefs.getString("search", "")}")
+                    .load("https://source.unsplash.com/random/?$searchTerm")
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(true)
                     .submit()
