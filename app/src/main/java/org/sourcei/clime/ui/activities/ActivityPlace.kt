@@ -16,7 +16,17 @@ package org.sourcei.clime.ui.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.common.api.Status
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.PlacesClient
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener
+import kotlinx.android.synthetic.main.activity_place.*
 import org.sourcei.clime.R
+import org.sourcei.clime.utils.functions.logd
+import org.sourcei.clime.utils.functions.loge
+import org.sourcei.clime.utils.functions.toast
 
 /**
  * @info -
@@ -27,11 +37,29 @@ import org.sourcei.clime.R
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
  */
-class ActivityPlace : AppCompatActivity() {
+class ActivityPlace : AppCompatActivity(), PlaceSelectionListener {
+    private lateinit var placesClient: PlacesClient
+    private lateinit var autocompleteFragment: AutocompleteSupportFragment
 
     // on create
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place)
+
+        placesClient = Places.createClient(this)
+        autocompleteFragment = searchPlace as AutocompleteSupportFragment
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
+        autocompleteFragment.setOnPlaceSelectedListener(this)
+    }
+
+    // on place selected
+    override fun onPlaceSelected(place: Place) {
+        logd("Place: " + place.name + ", " + place.latLng)
+    }
+
+    // place selection error
+    override fun onError(status: Status) {
+        loge("An error occurred: $status")
+        toast("error occurred while selecting place. Please try again")
     }
 }

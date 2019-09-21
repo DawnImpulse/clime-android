@@ -14,6 +14,10 @@
  **/
 package org.sourcei.clime.ui
 
+import android.app.Application
+import com.google.android.libraries.places.api.Places
+import org.sourcei.clime.BuildConfig
+
 /**
  * @info -
  *
@@ -23,3 +27,12 @@ package org.sourcei.clime.ui
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
  */
+class App : Application(){
+
+    // on create
+    override fun onCreate() {
+        super.onCreate()
+
+        Places.initialize(this, BuildConfig.PLACES_API_KEY)
+    }
+}
