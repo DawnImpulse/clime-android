@@ -25,10 +25,9 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_main.*
 import org.sourcei.clime.R
 import org.sourcei.clime.network.Model
-import org.sourcei.clime.utils.functions.F
-import org.sourcei.clime.utils.functions.loge
-import org.sourcei.clime.utils.functions.toCamelCase
-import org.sourcei.clime.utils.functions.toast
+import org.sourcei.clime.utils.functions.*
+import org.sourcei.clime.utils.reusables.Angles
+import org.sourcei.clime.utils.reusables.Gradients
 import org.sourcei.clime.utils.reusables.LOCATION
 import org.sourcei.clime.utils.reusables.Prefs
 
@@ -88,6 +87,8 @@ class ActivityMain : AppCompatActivity() {
                 place.text = "${it.name}, ${it.sys.country}"
                 temperature.text = "${F.toCelsius(it.main.temp.toFloat())}°C"
                 weather.text = it.weather[0].description.toCamelCase()
+
+                gradient.setGradient(Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(), 0, Angles.random().toFloat())
             }
         }
     }

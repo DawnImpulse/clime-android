@@ -26,3 +26,4 @@ import android.content.SharedPreferences
  * @note Updates :
  */
 lateinit var Prefs: SharedPreferences
+var Angles = listOf(45, 135, 210)
