@@ -14,9 +14,20 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+
+        debug {
+            buildConfigField "String", "WEATHER_API_URL", "\"${OPEN_WEATHER_URL}\""
+            buildConfigField "String", "WEATHER_API_KEY", "\"${OPEN_WEATHER_KEY}\""
+        }
+
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "WEATHER_API_URL", "\"${OPEN_WEATHER_URL}\""
+            buildConfigField "String", "WEATHER_API_KEY", "\"${OPEN_WEATHER_KEY}\""
+
+            useProguard false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
