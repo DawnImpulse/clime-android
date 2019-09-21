@@ -11,6 +11,7 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0.0"
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -18,11 +19,13 @@ android {
         debug {
             buildConfigField "String", "WEATHER_API_URL", "\"${OPEN_WEATHER_URL}\""
             buildConfigField "String", "WEATHER_API_KEY", "\"${OPEN_WEATHER_KEY}\""
+            buildConfigField "String", "PLACES_API_KEY", "\"${CLIME_GOOGLE_PLACES_API_KEY}\""
         }
 
         release {
             buildConfigField "String", "WEATHER_API_URL", "\"${OPEN_WEATHER_URL}\""
             buildConfigField "String", "WEATHER_API_KEY", "\"${OPEN_WEATHER_KEY}\""
+            buildConfigField "String", "PLACES_API_KEY", "\"${CLIME_GOOGLE_PLACES_API_KEY}\""
 
             useProguard false
             minifyEnabled true
@@ -32,12 +35,16 @@ android {
     }
 }
 
+
 dependencies {
     // ----------------- Google ----------------------
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
 
+    implementation 'com.google.android.libraries.places:places:2.0.0'
+
     // ----------------- Firebase ----------------------
+    implementation 'com.google.firebase:firebase-core:17.2.0'
 
     // ----------------- Others ----------------------
     implementation 'com.github.bumptech.glide:glide:4.9.0' // image loading
@@ -48,3 +55,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
+
+apply plugin: 'com.google.gms.google-services'
