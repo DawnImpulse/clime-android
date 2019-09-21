@@ -16,9 +16,9 @@
         tools:ignore="GoogleAppIndexingWarning">
 
 
-        <!--Get Place-->
+        <!--Main-->
         <activity
-            android:name=".ui.activities.ActivityPlace"
+            android:name=".ui.activities.ActivityMain"
             android:theme="@style/AppTheme.Fullscreen">
 
             <intent-filter>
@@ -27,6 +27,11 @@
             </intent-filter>
 
         </activity>
+
+        <!--Get Place-->
+        <activity
+            android:name=".ui.activities.ActivityPlace"
+            android:theme="@style/AppTheme.Fullscreen" />
 
     </application>
 </manifest>

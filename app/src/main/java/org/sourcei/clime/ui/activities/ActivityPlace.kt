@@ -75,6 +75,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
                         val intent = Intent()
                         intent.data = Uri.parse(Gson().toJson(it))
                         setResult(Activity.RESULT_OK, intent)
+                        finish()
                     }
                 }
             }
@@ -86,6 +87,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         val intent = Intent()
         intent.data = Uri.parse(Gson().toJson(place.latLng))
         setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     // place selection error
@@ -99,5 +101,6 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         super.onBackPressed()
 
         setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 }

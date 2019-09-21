@@ -15,6 +15,7 @@
 package org.sourcei.clime.utils.functions
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Point
 import android.net.ConnectivityManager
 import android.os.Build
@@ -25,6 +26,8 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.sourcei.clime.utils.handler.DialogHandler
 import kotlin.random.Random
 
@@ -76,6 +79,22 @@ object F {
         }
     }
 
+    // verify two bitmaps
+    fun compareBitmaps(b1: Bitmap?, b2: Bitmap?, callback: (Boolean) -> Unit) {
+
+        if (b1 == null || b2 == null) {
+            callback(false)
+        } else
+            GlobalScope.launch {
+                try {
+                    callback(b1.sameAs(b2)) // callback with compare
+                } catch (e: Exception) {
+                    //Crashlytics.logException(e)
+                    e.printStackTrace()
+                    callback(false)
+                }
+            }
+    }
 
     // get location
     fun getLocation(context: Context, callback: (LatLng?) -> Unit) {

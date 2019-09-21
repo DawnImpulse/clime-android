@@ -1,7 +1,7 @@
 /**
  * ISC License
  *
- * Copyright 2018-2019, Saksham (DawnImpulse)
+ * Copyright 2019, Saksham (DawnImpulse)
  *
  * Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted,
  * provided that the above copyright notice and this permission notice appear in all copies.
@@ -12,13 +12,9 @@
  * WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE
  * OR PERFORMANCE OF THIS SOFTWARE.
  **/
-package org.sourcei.clime.ui
+package org.sourcei.clime.utils.reusables
 
-import android.app.Application
-import androidx.preference.PreferenceManager
-import com.google.android.libraries.places.api.Places
-import org.sourcei.clime.BuildConfig
-import org.sourcei.clime.utils.reusables.Prefs
+import android.content.SharedPreferences
 
 /**
  * @info -
@@ -29,13 +25,4 @@ import org.sourcei.clime.utils.reusables.Prefs
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
  */
-class App : Application(){
-
-    // on create
-    override fun onCreate() {
-        super.onCreate()
-
-        Places.initialize(this, BuildConfig.PLACES_API_KEY)
-        Prefs = PreferenceManager.getDefaultSharedPreferences(this)
-    }
-}
+lateinit var Prefs: SharedPreferences
