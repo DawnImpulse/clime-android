@@ -33,9 +33,9 @@ object Repo {
     val client = RetroApiClient.getClient().create(Source::class.java)
 
     // get weather from coordinates
-    fun getWeatherCoordinates(lat: String, long: String, callback: (Any?, ObjectWeather?) -> Unit) {
+    fun getWeatherCoordinates(lat: Double, long: Double, callback: (Any?, ObjectWeather?) -> Unit) {
 
-        val call = client.coordinates(lat, long)
+        val call = client.coordinates(lat.toString(), long.toString())
 
         call.enqueue(object : Callback<ObjectWeather> {
 

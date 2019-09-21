@@ -30,14 +30,7 @@ import org.sourcei.clime.utils.reusables.Lifecycle
 class Model(private val activity: AppCompatActivity) {
 
     // get weather from coordinates
-    fun getWeatherCoordinates(lat: String, long: String, callback: (Any?, ObjectWeather?) -> Unit) {
-        Lifecycle.onStart(activity) {
-            Repo.getWeatherCoordinates(lat, long, callback)
-        }
-    }
-
-    // get weather city
-    fun getWeatherCity(lat: String, long: String, callback: (Any?, ObjectWeather?) -> Unit) {
+    fun getWeatherCoordinates(lat: Double, long: Double, callback: (Any?, ObjectWeather?) -> Unit) {
         Lifecycle.onStart(activity) {
             Repo.getWeatherCoordinates(lat, long, callback)
         }

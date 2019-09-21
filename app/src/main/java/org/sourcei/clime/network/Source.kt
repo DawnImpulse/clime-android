@@ -35,7 +35,7 @@ interface Source {
     @GET("data/2.5/weather")
     fun coordinates(
         @Query("lat") lat: String,
-        @Query("long") long: String,
+        @Query("lon") lon: String,
         @Query("APPID") appId: String = BuildConfig.WEATHER_API_KEY
     ): Call<ObjectWeather>
 

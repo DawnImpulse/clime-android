@@ -39,6 +39,7 @@ import org.sourcei.clime.BuildConfig
 import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
+import kotlin.math.round
 
 /**
  * @info -
@@ -56,6 +57,12 @@ fun Int.toHexa(): String {
 }
 
 
+// round of a double to nearest decimal
+fun Double.round(decimals: Int): Double {
+    var multiplier = 1.0
+    repeat(decimals) { multiplier *= 10 }
+    return round(this * multiplier) / multiplier
+}
 
 
 // gone view
@@ -108,9 +115,6 @@ fun View.setGradient(colors: IntArray, radius: Int = 0, angle: Float = 0F) {
     }
     background = bbg
 }
-
-
-
 
 
 // open activity
@@ -173,10 +177,6 @@ fun Context.startWeb(url: String) {
 }
 
 
-
-
-
-
 // file path string to uri
 fun String.toFileUri(): Uri {
     return Uri.fromFile(File(this))
@@ -218,9 +218,19 @@ fun String.toFile(): File {
     return File(this)
 }
 
-
-
-
+// camel case
+fun String.toCamelCase(): String {
+    return if (isNotEmpty()) {
+        val result = StringBuilder(length)
+        val words = split("\\ ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        for (i in words.indices) {
+            if (words[i].isNotEmpty())
+                result.append(Character.toUpperCase(words[i][0])).append(words[i].substring(1)).append(" ")
+        }
+        result.toString()
+    } else
+        this
+}
 
 
 //convert to content uri
@@ -241,11 +251,6 @@ fun Uri.getMime(context: Context): String? {
 }
 
 
-
-
-
-
-
 // put directly with shared preference object
 fun SharedPreferences.putAny(name: String, any: Any) {
     when (any) {
@@ -260,9 +265,6 @@ fun SharedPreferences.remove(name: String) {
 }
 
 
-
-
-
 // json put params
 fun jsonOf(vararg pairs: Pair<String, Any>) = JSONObject().apply {
     pairs.forEach {
@@ -274,21 +276,21 @@ fun jsonOf(vararg pairs: Pair<String, Any>) = JSONObject().apply {
 fun logd(message: Any) {
     if (BuildConfig.DEBUG)
         Log.d(
-            "wallup",
-            "${Exception().stackTrace[1].className.replace(
-                "${BuildConfig.APPLICATION_ID}.",
-                ""
-            )} :: $message"
+                "wallup",
+                "${Exception().stackTrace[1].className.replace(
+                        "${BuildConfig.APPLICATION_ID}.",
+                        ""
+                )} :: $message"
         )
 }
 
 fun loge(message: Any) {
     if (BuildConfig.DEBUG)
         Log.e(
-            "wallup",
-            "${Exception().stackTrace[1].className.replace(
-                "${BuildConfig.APPLICATION_ID}.",
-                ""
-            )} :: $message"
+                "wallup",
+                "${Exception().stackTrace[1].className.replace(
+                        "${BuildConfig.APPLICATION_ID}.",
+                        ""
+                )} :: $message"
         )
 }

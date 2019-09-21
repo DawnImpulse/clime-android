@@ -124,5 +124,14 @@ object F {
         }
     }
 
+    // convert K -> C
+    fun toCelsius(temp: Float): Float {
+        return (temp - 273.15).round(1).toFloat()
+    }
+
+    // convert K -> F
+    fun toFarenheit(temp: Float): Float {
+        return ((temp - 273) * 1.8 + 32).round(1).toFloat()
+    }
 
 }
