@@ -18,7 +18,14 @@ import android.content.Context
 import android.graphics.Point
 import android.net.ConnectivityManager
 import android.os.Build
+import android.os.Looper
 import android.view.WindowManager
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
+import org.sourcei.clime.utils.handler.DialogHandler
 import kotlin.random.Random
 
 
@@ -59,13 +66,42 @@ object F {
     }
 
     //connection listener
-    fun isConnected(context: Context) : Boolean{
+    fun isConnected(context: Context): Boolean {
         val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             cm.isDefaultNetworkActive
         } else {
             cm.activeNetworkInfo?.isConnected == true
+        }
+    }
+
+
+    // get location
+    fun getLocation(context: Context, callback: (LatLng?) -> Unit) {
+
+        // location callback
+        val locationCallback = object : LocationCallback() {
+            override fun onLocationResult(location: LocationResult?) {
+                super.onLocationResult(location)
+
+                DialogHandler.dismiss()
+                if (location != null) {
+                    callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
+                } else
+                    callback(null)
+            }
+        }
+
+        // start location listener
+        val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+        fusedLocationProviderClient.lastLocation.addOnSuccessListener {
+            if (it != null) {
+                callback(LatLng(it.latitude, it.longitude))
+            } else {
+                DialogHandler.progress(context)
+                fusedLocationProviderClient.requestLocationUpdates(LocationRequest().setNumUpdates(1), locationCallback, Looper.getMainLooper())
+            }
         }
     }
 

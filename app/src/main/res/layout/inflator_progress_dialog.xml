@@ -12,47 +12,29 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
 OR PERFORMANCE OF THIS SOFTWARE.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingTop="32dp"
+    android:paddingBottom="32dp">
 
-    <!--Auto complete-->
-    <fragment
-        android:id="@+id/searchPlace"
-        android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="48dp" />
-
-    <!--Use current location-->
     <LinearLayout
-        android:id="@+id/gps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:background="?selectableItemBackground"
-        android:orientation="vertical">
+        android:layout_centerHorizontal="true">
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:layout_gravity="center"
-            app:srcCompat="@drawable/vd_gps" />
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/gps_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="16dp"
-            android:text="Use Current Location"
-            android:textColor="#E5E5E5"
+            android:layout_marginLeft="36dp"
+            android:text="Getting Location ..."
+            android:textSize="18sp"
             android:textStyle="bold" />
-
     </LinearLayout>
 
 </RelativeLayout>
