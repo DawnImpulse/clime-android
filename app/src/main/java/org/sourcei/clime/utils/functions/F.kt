@@ -16,6 +16,8 @@ package org.sourcei.clime.utils.functions
 
 import android.content.Context
 import android.graphics.Point
+import android.net.ConnectivityManager
+import android.os.Build
 import android.view.WindowManager
 import kotlin.random.Random
 
@@ -51,8 +53,21 @@ object F {
     fun shortid(): String {
         val charPool: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         return (1..10)
-            .map { Random.nextInt(0, charPool.size) }
-            .map(charPool::get)
-            .joinToString("")
+                .map { Random.nextInt(0, charPool.size) }
+                .map(charPool::get)
+                .joinToString("")
     }
+
+    //connection listener
+    fun isConnected(context: Context) : Boolean{
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cm.isDefaultNetworkActive
+        } else {
+            cm.activeNetworkInfo?.isConnected == true
+        }
+    }
+
+
 }
