@@ -43,11 +43,11 @@ object ImageHandler {
 
         GlobalScope.launch {
             val future = Glide.with(context)
-                    .asBitmap()
-                    .load("https://source.unsplash.com/random/?$searchTerm")
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .submit()
+                .asBitmap()
+                .load("https://source.unsplash.com/random/?$searchTerm")
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .submit()
 
             try {
                 val bitmapN = future.get()
@@ -61,6 +61,23 @@ object ImageHandler {
                 e.printStackTrace()
                 (context as AppCompatActivity).runOnUiThread { callback(null) }
             }
+        }
+    }
+
+    // get bitmap wallpaper
+    fun getBitmapWallpaper(context: Context, callback: (Bitmap?) -> Unit) {
+
+        val searchTerm = F.getSearchTerm(Prefs.getString(ICON, "01d")!!)
+
+        GlobalScope.launch {
+            val future = Glide.with(context)
+                .asBitmap()
+                .load("https://source.unsplash.com/random/1440x3040/?$searchTerm")
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+                .submit()
+
+            (context as AppCompatActivity).runOnUiThread { callback(future.get()) }
         }
     }
 }
