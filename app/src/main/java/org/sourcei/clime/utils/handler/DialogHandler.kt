@@ -28,6 +28,7 @@ import org.sourcei.clime.R
  *
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
+ *  Saksham - 2019 09 21 - master - non cancellable progress
  */
 object DialogHandler {
     private lateinit var alertDialog: AlertDialog
@@ -55,6 +56,16 @@ object DialogHandler {
             dialog.dismiss()
             callback()
         }
+
+        alertDialog = builder.create()
+        alertDialog.setView(LayoutInflater.from(context).inflate(R.layout.inflator_progress_dialog, null))
+        alertDialog.show()
+    }
+
+    // indeterminate progress bar
+    fun progressNonCancellable(context: Context) {
+        val builder = AlertDialog.Builder(context)
+       builder.setCancelable(false)
 
         alertDialog = builder.create()
         alertDialog.setView(LayoutInflater.from(context).inflate(R.layout.inflator_progress_dialog, null))

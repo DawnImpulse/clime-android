@@ -14,9 +14,11 @@
  **/
 package org.sourcei.clime.utils.functions
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Point
+import android.location.Geocoder
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.Looper
@@ -108,7 +110,12 @@ object F {
                 DialogHandler.dismiss()
                 if (update) {
                     if (location != null) {
-                        callback(LatLng(location.lastLocation.latitude, location.lastLocation.longitude))
+                        callback(
+                                LatLng(
+                                        location.lastLocation.latitude,
+                                        location.lastLocation.longitude
+                                )
+                        )
                     } else
                         callback(null)
                 }
@@ -187,6 +194,41 @@ object F {
             "13n" -> "snow night"
             "50d" -> "mist"
             else -> "mist night"
+        }
+    }
+
+    // get place from coordinates
+    @SuppressLint("DefaultLocale")
+    fun getPlaceFromLatLon(context: Context, latLng: LatLng, callback: (String?) -> Unit) {
+
+        DialogHandler.progressNonCancellable(context)
+        GlobalScope.launch {
+            try {
+                val geocoder = Geocoder(context)
+                val address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+                callback("${address[0].locality}, ${address[0].countryCode.toUpperCase()}")
+                DialogHandler.dismiss()
+
+            } catch (e: Exception) {
+                e.printStackTrace()
+                callback(null)
+            }
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    fun getPlaceFromLatLonSync(context: Context, latLng: LatLng): String {
+
+        return try {
+            val geocoder = Geocoder(context)
+            val address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
+
+            "${address[0].locality},${address[0].countryCode.toUpperCase()}"
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            "Somewhere on Earth"
         }
     }
 

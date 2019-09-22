@@ -30,6 +30,7 @@ import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.*
 import org.sourcei.clime.utils.reusables.NEWLATLON
+import org.sourcei.clime.utils.reusables.PLACE
 import org.sourcei.clime.utils.reusables.Prefs
 import org.sourcei.clime.utils.reusables.USER_LOCATION
 
@@ -55,7 +56,12 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         // init places autocomplete
         placesClient = Places.createClient(this)
         autocompleteFragment = searchPlace as AutocompleteSupportFragment
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.LAT_LNG))
+        autocompleteFragment.setPlaceFields(
+            listOf(
+                Place.Field.LAT_LNG,
+                Place.Field.ADDRESS_COMPONENTS
+            )
+        )
 
         autocompleteFragment.setOnPlaceSelectedListener(this)
         gps.setOnClickListener(this)
@@ -72,17 +78,33 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
             gps.id -> {
                 Permissions.askAccessFineLocationPermission(this) { e, r ->
                     e?.let {
-                        toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
+                        toast(
+                            "permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)",
+                            Toast.LENGTH_LONG
+                        )
                     }
                     r?.let {
                         F.getCurrentLocation(this) {
                             if (it == null)
-                                toast("location not available, enable your device gps/internet then try again. Alternatively you can search for your city", Toast.LENGTH_LONG)
+                                toast(
+                                    "location not available, enable your device gps/internet then try again. Alternatively you can search for your city",
+                                    Toast.LENGTH_LONG
+                                )
                             else {
                                 Prefs.putAny(NEWLATLON, Gson().toJson(it))
                                 Prefs.remove(USER_LOCATION)
-                                toast("location changed")
-                                finish()
+
+                                F.getPlaceFromLatLon(this, it) {
+                                    runOnUiThread {
+                                        if (it == null)
+                                            toast("location changed,unable to find name of place due to no internet")
+                                        else
+                                            toast("location changed")
+
+                                        Prefs.putAny(PLACE, it ?: "Somewhere on Earth")
+                                        finish()
+                                    }
+                                }
                             }
                         }
                     }
@@ -97,13 +119,24 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         logd(Gson().toJson(place))
         Prefs.putAny(NEWLATLON, Gson().toJson(place.latLng))
         Prefs.putAny(USER_LOCATION, Gson().toJson(place.latLng))
-        toast("location changed")
-        finish()
+
+        F.getPlaceFromLatLon(this, place.latLng!!) {
+            runOnUiThread {
+                if (it == null)
+                    toast("location changed,unable to find name of place due to no internet")
+                else
+                    toast("location changed")
+
+                Prefs.putAny(PLACE, it ?: "Somewhere on Earth")
+                finish()
+            }
+        }
     }
 
     // place selection error
     override fun onError(status: Status) {
         loge("An error occurred: $status")
         toast("error occurred while selecting place. Please try again")
+
     }
 }

@@ -118,10 +118,19 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                     // if location permission available then get user location
                     Prefs.remove(USER_LOCATION)
 
+                    // handle location
                     fun handling(latLng: LatLng?) {
                         if (latLng != null) {
                             location = latLng
-                            setData()
+                            // get place name
+                            F.getPlaceFromLatLon(this, latLng) {
+                                runOnUiThread {
+                                    if (it == null)
+                                        toast("location changed,unable to find name of place due to no internet")
+                                    Prefs.putAny(PLACE, it ?: "Somewhere on Earth")
+                                    setData()
+                                }
+                            }
                         } else {
                             swipe.isRefreshing = false
                             startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
@@ -150,20 +159,19 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 val w = it.weather[0].description.toCamelCase()
 
 
-                place.text = p
+                place.text = Prefs.getString(PLACE, p)
                 temperature.text = t
                 weather.text = w
 
-                Prefs.putAny(PLACE, p)
                 Prefs.putAny(WEATHER, w)
                 Prefs.putAny(TEMPERATURE, t)
                 Prefs.putAny(LATLON, Gson().toJson(location))
                 Prefs.putAny(ICON, it.weather[0].icon)
 
                 gradient.setGradient(
-                    Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(),
-                    0,
-                    Angles.random().toFloat()
+                        Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(),
+                        0,
+                        Angles.random().toFloat()
                 )
                 swipe.isRefreshing = false
 
@@ -185,7 +193,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     // set stored data
     private fun setAvailableData() {
-        val p = Prefs.getString(PLACE, "")!!
+        val p = Prefs.getString(PLACE, "Somewhere on Earth")!!
         val t = Prefs.getString(TEMPERATURE, "")!!
         val w = Prefs.getString(WEATHER, "")!!
         val i = Prefs.getString(ICON, "")!!
@@ -195,11 +203,8 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         temperature.text = t
         weather.text = w
 
-        gradient.setGradient(
-            Gradients.getWeatherGradients(i).toIntArray(),
-            0,
-            Angles.random().toFloat()
-        )
+        gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
+
         if (File(cacheDir, "homescreen.jpg").exists()) {
             bitmap = StorageHandler.getBitmapFromFile(File(cacheDir, "homescreen.jpg"))
             image.setImageBitmap(bitmap)

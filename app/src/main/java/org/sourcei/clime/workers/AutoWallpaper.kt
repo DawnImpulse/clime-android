@@ -68,11 +68,10 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                     callback(false)
                 }
                 r?.let {
-                    val p = "${it.name}, ${it.sys.country}"
+
                     val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
                     val w = it.weather[0].description.toCamelCase()
 
-                    Prefs.putAny(PLACE, p)
                     Prefs.putAny(WEATHER, w)
                     Prefs.putAny(TEMPERATURE, t)
 
