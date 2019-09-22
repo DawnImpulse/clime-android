@@ -133,6 +133,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 Prefs.putAny(PLACE, p)
                 Prefs.putAny(WEATHER, w)
                 Prefs.putAny(TEMPERATURE, t)
+                Prefs.putAny(LATLON, Gson().toJson(location))
                 Prefs.putAny(ICON, it.weather[0].icon)
 
                 gradient.setGradient(Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(), 0, Angles.random().toFloat())

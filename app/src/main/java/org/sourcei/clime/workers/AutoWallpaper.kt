@@ -21,8 +21,16 @@ import android.os.Looper
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
+import com.google.android.gms.maps.model.LatLng
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.gson.Gson
+import org.sourcei.clime.network.Repo
+import org.sourcei.clime.utils.functions.F
+import org.sourcei.clime.utils.functions.loge
+import org.sourcei.clime.utils.functions.putAny
+import org.sourcei.clime.utils.functions.toCamelCase
 import org.sourcei.clime.utils.handler.ImageHandler
+import org.sourcei.clime.utils.reusables.*
 
 /**
  * @info -
@@ -32,8 +40,10 @@ import org.sourcei.clime.utils.handler.ImageHandler
  *
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
+ *  Saksham - 2019 09 21 - master - get current weather
  */
-class AutoWallpaper(private val appContext: Context, workerParams: WorkerParameters) : ListenableWorker(appContext, workerParams) {
+class AutoWallpaper(private val appContext: Context, workerParams: WorkerParameters) :
+    ListenableWorker(appContext, workerParams) {
     private lateinit var wallpaperManager: WallpaperManager
     private lateinit var handler: Handler
 
@@ -45,7 +55,7 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
 
             wallpaperManager = WallpaperManager.getInstance(appContext)
             handler = Handler(Looper.getMainLooper())
-            wallpaperChange {
+            getWeather {
                 if (it)
                     completer.set(Result.success())
                 else
@@ -54,10 +64,35 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
         }
     }
 
-    // -----------------------------
-    //   wallpaper change handling
-    // -----------------------------
+    // get weather for the place
+    private fun getWeather(callback: (Boolean) -> Unit) {
+        if (Prefs.contains(WEATHER)) {
+            val latlon = Gson().fromJson(Prefs.getString(LATLON, ""), LatLng::class.java)
+            Repo.getWeatherCoordinates(latlon.latitude, latlon.longitude) { e, r ->
+                e?.let {
+                    loge(it)
+                    callback(false)
+                }
+                r?.let {
+                    val p = "${it.name}, ${it.sys.country}"
+                    val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                    val w = it.weather[0].description.toCamelCase()
+
+                    Prefs.putAny(PLACE, p)
+                    Prefs.putAny(WEATHER, w)
+                    Prefs.putAny(TEMPERATURE, t)
+                    Prefs.putAny(ICON, it.weather[0].icon)
+
+                    wallpaperChange(callback)
+                }
+            }
+        } else
+            callback(false)
+    }
+
+    // get image & change homescreen wallpaper
     private fun wallpaperChange(callback: (Boolean) -> Unit) {
+
         ImageHandler.getBitmapWallpaper(appContext) {
             if (it != null) {
                 wallpaperManager.setBitmap(it)
@@ -66,5 +101,6 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                 callback(false)
         }
     }
+
 
 }
