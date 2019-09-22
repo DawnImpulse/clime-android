@@ -170,10 +170,10 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, 
                 val wi: String
 
                 if (Prefs.getString(UNITS, METRIC) == METRIC) {
-                    t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                    t = "${F.toCelsius(it.main.temp.toFloat()).toInt()}°C"
                     wi = it.wind.speed.toDouble().round(1).toString() + "  winds (k/h)"
                 } else {
-                    t = "${F.toFarenheit(it.main.temp.toFloat())}°F"
+                    t = "${F.toFahrenheit(it.main.temp.toFloat()).toInt()}°F"
                     wi = F.toMiles(it.wind.speed) + "  winds (m/h)"
                 }
 

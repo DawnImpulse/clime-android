@@ -26,6 +26,16 @@
             android:title="Status"
             app:iconSpaceReserved="true" />
 
+        <!--Change-->
+        <SwitchPreference
+            android:defaultValue="true"
+            android:dependency="wallStatus"
+            android:key="change"
+            android:summaryOff="Will only change wallpaper when there is a change in weather condition (checked every 30min)"
+            android:summaryOn="Wallpaper will be changed every 1 hour based on the current weather condition."
+            android:title="Change based on weather condition"
+            app:iconSpaceReserved="true" />
+
         <!--Wifi-->
         <SwitchPreference
             android:defaultValue="false"

@@ -169,7 +169,7 @@ object F {
     }
 
     // convert K -> F
-    fun toFarenheit(temp: Float): Float {
+    fun toFahrenheit(temp: Float): Float {
         return ((temp - 273) * 1.8 + 32).round(1).toFloat()
     }
 

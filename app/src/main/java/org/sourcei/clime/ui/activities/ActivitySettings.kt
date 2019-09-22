@@ -50,6 +50,7 @@ class ActivitySettings : AppCompatActivity() {
         private lateinit var wallWifi: SwitchPreference
         private lateinit var crashlytics: SwitchPreference
         private lateinit var analytics: SwitchPreference
+        private lateinit var change: SwitchPreference
         private lateinit var units: Preference
 
         // set preference layout
@@ -62,6 +63,7 @@ class ActivitySettings : AppCompatActivity() {
             crashlytics = findPreference("crashlytics")!!
             analytics = findPreference("analytics")!!
             units = findPreference("units")!!
+            change = findPreference("change")!!
 
             // setting application version
             findPreference<Preference>("version")!!.summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
@@ -77,6 +79,7 @@ class ActivitySettings : AppCompatActivity() {
             wallStatus.onPreferenceChangeListener = this
             wallWifi.onPreferenceChangeListener = this
             units.onPreferenceClickListener = this
+            change.onPreferenceChangeListener = this
 
         }
 
@@ -100,6 +103,16 @@ class ActivitySettings : AppCompatActivity() {
                 // wifi
                 wallWifi -> {
                     Prefs.putAny("wallWifi", newValue as Boolean)
+                    setWallpaper()
+                }
+
+                // change
+                change -> {
+                    WorkManager.getInstance(context!!).cancelWorkById(UUID.fromString(Prefs.getString(AUTO_WALLPAPER, "")))
+                    Prefs.remove(AUTO_WALLPAPER)
+
+                    newValue as Boolean
+                    Prefs.putAny(CHANGE, newValue)
                     setWallpaper()
                 }
 
@@ -130,8 +143,9 @@ class ActivitySettings : AppCompatActivity() {
                 Prefs.remove(AUTO_WALLPAPER)
             }
 
-            // get time
+            // get wifi & time
             val isWifi = Prefs.getBoolean("wallWifi", true)
+            val time = if (Prefs.getBoolean(CHANGE,true)) 60 else 30
 
 
             val builder = Constraints.Builder()
@@ -140,7 +154,7 @@ class ActivitySettings : AppCompatActivity() {
 
             // start wallpaper worker
             val uploadWorkRequest =
-                    PeriodicWorkRequestBuilder<AutoWallpaper>(30, TimeUnit.MINUTES)
+                    PeriodicWorkRequestBuilder<AutoWallpaper>(time.toLong(), TimeUnit.MINUTES)
                             .setConstraints(builder)
                             .build()
 

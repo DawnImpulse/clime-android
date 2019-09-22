@@ -69,14 +69,14 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                 }
                 r?.let {
 
-                    val t:String
-                    val wi:String
+                    val t: String
+                    val wi: String
 
                     if (Prefs.getString(UNITS, METRIC) == METRIC) {
                         t = "${F.toCelsius(it.main.temp.toFloat())}°C"
                         wi = it.wind.speed.toDouble().round(1).toString() + "  winds (k/h)"
                     } else {
-                        t = "${F.toFarenheit(it.main.temp.toFloat())}°F"
+                        t = "${F.toFahrenheit(it.main.temp.toFloat())}°F"
                         wi = F.toMiles(it.wind.speed) + "  winds (m/h)"
                     }
 
@@ -90,10 +90,18 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                     Prefs.putAny(CLOUDS, c)
                     Prefs.putAny(WIND, wi)
 
-                    // only change wallpaper if there is change in condition (icon change)
-                    if (Prefs.getString(ICON, "") == it.weather[0].icon && Prefs.contains(WALL_CHANGED))
+
+                    // change weather irrespective of weather condition changes
+                    if (Prefs.getBoolean(CHANGE, true)) {
+                        Prefs.putAny(ICON, it.weather[0].icon)
+                        Prefs.putAny(WALL_CHANGED, true)
+                        wallpaperChange(callback)
+
+                        // only change weather when it changes
+                    } else if (Prefs.getString(ICON, "") == it.weather[0].icon && Prefs.contains(WALL_CHANGED))
                         callback(true)
                     else {
+                        // change weather
                         Prefs.putAny(ICON, it.weather[0].icon)
                         Prefs.putAny(WALL_CHANGED, true)
                         wallpaperChange(callback)
