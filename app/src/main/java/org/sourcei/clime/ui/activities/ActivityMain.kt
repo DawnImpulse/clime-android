@@ -18,7 +18,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.maps.model.LatLng
@@ -85,15 +84,6 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 Prefs.remove(WALL_CHANGED)
             }
         }
-
-        // if don't get location the first time even
-        if (!::location.isInitialized) {
-            toast(
-                "unable to get location, kindly provide your location in Settings",
-                Toast.LENGTH_LONG
-            )
-            swipe.isRefreshing = false
-        }
     }
 
     // remove newlatlon
@@ -132,8 +122,10 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                         if (latLng != null) {
                             location = latLng
                             setData()
-                        } else
+                        } else {
+                            swipe.isRefreshing = false
                             startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
+                        }
                     }
 
                     if (current)

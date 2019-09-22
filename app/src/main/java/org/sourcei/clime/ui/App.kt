@@ -15,9 +15,15 @@
 package org.sourcei.clime.ui
 
 import android.app.Application
+import androidx.multidex.MultiDex
 import androidx.preference.PreferenceManager
+import com.crashlytics.android.Crashlytics
 import com.google.android.libraries.places.api.Places
+import com.google.firebase.analytics.FirebaseAnalytics
+import io.fabric.sdk.android.Fabric
 import org.sourcei.clime.BuildConfig
+import org.sourcei.clime.utils.reusables.ANALYTICS
+import org.sourcei.clime.utils.reusables.CRASHLYTICS
 import org.sourcei.clime.utils.reusables.Prefs
 
 /**
@@ -35,7 +41,18 @@ class App : Application(){
     override fun onCreate() {
         super.onCreate()
 
+        MultiDex.install(this)
         Places.initialize(this, BuildConfig.PLACES_API_KEY)
         Prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        analytics()
+    }
+
+    // enabling crashlytics in release builds
+    private fun analytics() {
+        if (!BuildConfig.DEBUG) {
+            if (Prefs.getBoolean(CRASHLYTICS, true))
+                Fabric.with(this, Crashlytics())
+            FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(Prefs.getBoolean(ANALYTICS, true))
+        }
     }
 }
