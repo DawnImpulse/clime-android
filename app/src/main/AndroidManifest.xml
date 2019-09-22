@@ -34,5 +34,11 @@
             android:name=".ui.activities.ActivityPlace"
             android:theme="@style/AppTheme.Fullscreen" />
 
+
+        <!--Settings-->
+        <activity
+            android:name=".ui.activities.ActivitySettings"
+            android:theme="@style/AppTheme.Fullscreen" />
+
     </application>
 </manifest>

@@ -14,9 +14,6 @@
  **/
 package org.sourcei.clime.ui.activities
 
-import android.app.Activity
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -31,12 +28,11 @@ import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_place.*
 import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
-import org.sourcei.clime.utils.functions.F
-import org.sourcei.clime.utils.functions.loge
-import org.sourcei.clime.utils.functions.setGradient
-import org.sourcei.clime.utils.functions.toast
+import org.sourcei.clime.utils.functions.*
 import org.sourcei.clime.utils.reusables.Angles
 import org.sourcei.clime.utils.reusables.Gradients
+import org.sourcei.clime.utils.reusables.NEWLATLON
+import org.sourcei.clime.utils.reusables.Prefs
 
 /**
  * @info -
@@ -46,6 +42,7 @@ import org.sourcei.clime.utils.reusables.Gradients
  *
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
+ *  Saksham - 2019 09 22 - master - save location in prefs
  */
 class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickListener {
     private lateinit var placesClient: PlacesClient
@@ -79,9 +76,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
                     if (it == null)
                         toast("location not available, enable your device gps/internet then try again. Alternatively you can search for your city", Toast.LENGTH_LONG)
                     else {
-                        val intent = Intent()
-                        intent.data = Uri.parse(Gson().toJson(it))
-                        setResult(Activity.RESULT_OK, intent)
+                        Prefs.putAny(NEWLATLON, Gson().toJson(it))
                         finish()
                     }
                 }
@@ -91,9 +86,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
 
     // on place selected
     override fun onPlaceSelected(place: Place) {
-        val intent = Intent()
-        intent.data = Uri.parse(Gson().toJson(place.latLng))
-        setResult(Activity.RESULT_OK, intent)
+        Prefs.putAny(NEWLATLON, Gson().toJson(place.latLng))
         finish()
     }
 
@@ -101,13 +94,5 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
     override fun onError(status: Status) {
         loge("An error occurred: $status")
         toast("error occurred while selecting place. Please try again")
-    }
-
-    // on back pressed
-    override fun onBackPressed() {
-        super.onBackPressed()
-
-        setResult(Activity.RESULT_CANCELED)
-        finish()
     }
 }

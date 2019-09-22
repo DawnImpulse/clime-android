@@ -62,6 +62,25 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             setAvailableData()
 
         swipe.setOnRefreshListener(this)
+        settings.setOnClickListener { openActivity(ActivitySettings::class.java) }
+    }
+
+    // on resume
+    override fun onResume() {
+        super.onResume()
+
+        if (Prefs.contains(NEWLATLON)) {
+            val new = Gson().fromJson(NEWLATLON, LatLng::class.java)
+            if (::location.isInitialized) {
+                if (location.latitude != new.latitude || location.longitude != new.longitude) {
+                    location = new
+                    setData()
+                }
+            } else {
+                location = new
+                setData()
+            }
+        }
     }
 
     // set activity result (for location)
@@ -161,6 +180,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         val t = Prefs.getString(TEMPERATURE, "")!!
         val w = Prefs.getString(WEATHER, "")!!
         val i = Prefs.getString(ICON, "")!!
+        location = Gson().fromJson(Prefs.getString(LATLON, ""), LatLng::class.java)
 
         place.text = p
         temperature.text = t

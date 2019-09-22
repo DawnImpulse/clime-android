@@ -59,19 +59,6 @@
 
     </PreferenceCategory>
 
-    <!--Settings-->
-    <PreferenceCategory
-        android:title="Settings"
-        app:iconSpaceReserved="false">
-
-        <!--Clear All Cache-->
-        <Preference
-            android:key="deleteCache"
-            android:title="Clear All Cache"
-            app:summary="Delete all cached images ?" />
-
-    </PreferenceCategory>
-
     <!--Services-->
     <PreferenceCategory
         android:title="Services"
@@ -90,6 +77,23 @@
             android:key="analytics"
             android:summary="@string/analytics"
             android:title="Analytics" />
+    </PreferenceCategory>
+
+    <!--Settings-->
+    <PreferenceCategory
+        android:title="Settings"
+        app:iconSpaceReserved="false">
+
+        <!--View Cached Images-->
+        <Preference
+            android:selectable="true"
+            android:title="Change location">
+
+            <intent
+                android:action="android.intent.action.VIEW"
+                android:targetClass="org.sourcei.clime.ui.activities.ActivityPlace"
+                android:targetPackage="org.sourcei.clime" />
+        </Preference>
     </PreferenceCategory>
 
     <!--License-->
@@ -259,4 +263,5 @@
             app:allowDividerAbove="false"
             app:allowDividerBelow="false" />
     </PreferenceCategory>
+
 </PreferenceScreen>

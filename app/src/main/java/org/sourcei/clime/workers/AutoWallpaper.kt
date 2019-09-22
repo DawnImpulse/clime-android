@@ -42,14 +42,11 @@ import org.sourcei.clime.utils.reusables.*
  * @note Updates :
  *  Saksham - 2019 09 21 - master - get current weather
  */
-class AutoWallpaper(private val appContext: Context, workerParams: WorkerParameters) :
-    ListenableWorker(appContext, workerParams) {
+class AutoWallpaper(private val appContext: Context, workerParams: WorkerParameters) : ListenableWorker(appContext, workerParams) {
     private lateinit var wallpaperManager: WallpaperManager
     private lateinit var handler: Handler
 
-    // ----------------
-    //   start work
-    // ----------------
+    // start work
     override fun startWork(): ListenableFuture<Result> {
         return CallbackToFutureAdapter.getFuture { completer ->
 
@@ -81,9 +78,14 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                     Prefs.putAny(PLACE, p)
                     Prefs.putAny(WEATHER, w)
                     Prefs.putAny(TEMPERATURE, t)
-                    Prefs.putAny(ICON, it.weather[0].icon)
 
-                    wallpaperChange(callback)
+                    // only change wallpaper if there is change in condition (icon change)
+                    if (Prefs.getString(ICON, "") == it.weather[0].icon)
+                        callback(true)
+                    else {
+                        Prefs.putAny(ICON, it.weather[0].icon)
+                        wallpaperChange(callback)
+                    }
                 }
             }
         } else
