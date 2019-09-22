@@ -14,7 +14,6 @@
  **/
 package org.sourcei.clime.ui.activities
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -30,7 +29,9 @@ import kotlinx.android.synthetic.main.activity_place.*
 import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.*
-import org.sourcei.clime.utils.reusables.*
+import org.sourcei.clime.utils.reusables.NEWLATLON
+import org.sourcei.clime.utils.reusables.Prefs
+import org.sourcei.clime.utils.reusables.USER_LOCATION
 
 /**
  * @info -
@@ -51,9 +52,6 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_place)
 
-        // set background gradient
-        placeBg.setGradient(Gradients.getRandomGradient(), 0, Angles.random().toFloat())
-
         // init places autocomplete
         placesClient = Places.createClient(this)
         autocompleteFragment = searchPlace as AutocompleteSupportFragment
@@ -61,22 +59,32 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
 
         autocompleteFragment.setOnPlaceSelectedListener(this)
         gps.setOnClickListener(this)
+        bg.setOnClickListener(this)
     }
 
     // on click handling
     override fun onClick(v: View) {
-        Permissions.askAccessFineLocationPermission(this) { e, r ->
-            e?.let {
-                toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
-            }
-            r?.let {
-                F.getCurrentLocation(this) {
-                    if (it == null)
-                        toast("location not available, enable your device gps/internet then try again. Alternatively you can search for your city", Toast.LENGTH_LONG)
-                    else {
-                        Prefs.putAny(NEWLATLON, Gson().toJson(it))
-                        Prefs.remove(USER_LOCATION)
-                        finish()
+
+        when (v.id) {
+
+            bg.id -> finish()
+
+            gps.id -> {
+                Permissions.askAccessFineLocationPermission(this) { e, r ->
+                    e?.let {
+                        toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
+                    }
+                    r?.let {
+                        F.getCurrentLocation(this) {
+                            if (it == null)
+                                toast("location not available, enable your device gps/internet then try again. Alternatively you can search for your city", Toast.LENGTH_LONG)
+                            else {
+                                Prefs.putAny(NEWLATLON, Gson().toJson(it))
+                                Prefs.remove(USER_LOCATION)
+                                toast("location changed")
+                                finish()
+                            }
+                        }
                     }
                 }
             }
@@ -89,6 +97,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         logd(Gson().toJson(place))
         Prefs.putAny(NEWLATLON, Gson().toJson(place.latLng))
         Prefs.putAny(USER_LOCATION, Gson().toJson(place.latLng))
+        toast("location changed")
         finish()
     }
 
@@ -96,9 +105,5 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
     override fun onError(status: Status) {
         loge("An error occurred: $status")
         toast("error occurred while selecting place. Please try again")
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
     }
 }

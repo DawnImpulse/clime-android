@@ -32,7 +32,7 @@
         <!--Get Place-->
         <activity
             android:name=".ui.activities.ActivityPlace"
-            android:theme="@style/AppTheme.Fullscreen" />
+            android:theme="@style/AppTheme.NoActionBar.Translucent" />
 
 
         <!--Settings-->

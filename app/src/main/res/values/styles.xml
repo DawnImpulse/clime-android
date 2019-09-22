@@ -16,8 +16,16 @@
 
     <!--Fullscreen-->
     <style name="AppTheme.Fullscreen" parent="AppTheme.NoActionBar">
-        <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+    </style>
+
+    <!--No action bar translucent -->
+    <style name="AppTheme.NoActionBar.Translucent" parent="AppTheme.Fullscreen">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
     </style>
 
 </resources>
