@@ -28,7 +28,7 @@
 
         <!--Wifi-->
         <SwitchPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:dependency="wallStatus"
             android:key="wallWifi"
             android:summaryOff="Will use any network type to cache images &amp; set wallpaper"
@@ -49,6 +49,19 @@
 
     </PreferenceCategory>
 
+    <!--Settings-->
+    <PreferenceCategory
+        android:title="Settings"
+        app:iconSpaceReserved="false">
+
+        <!--Units-->
+        <Preference
+            android:key="units"
+            android:selectable="true"
+            android:summary="Metric (°C) / Wind (Kmph)"
+            android:title="Temperature / Wind Units" />
+    </PreferenceCategory>
+
     <!--Services-->
     <PreferenceCategory
         android:title="Services"
@@ -67,23 +80,6 @@
             android:key="analytics"
             android:summary="@string/analytics"
             android:title="Analytics" />
-    </PreferenceCategory>
-
-    <!--Settings-->
-    <PreferenceCategory
-        android:title="Settings"
-        app:iconSpaceReserved="false">
-
-        <!--View Cached Images-->
-        <Preference
-            android:selectable="true"
-            android:title="Change location">
-
-            <intent
-                android:action="android.intent.action.VIEW"
-                android:targetClass="org.sourcei.clime.ui.activities.ActivityPlace"
-                android:targetPackage="org.sourcei.clime" />
-        </Preference>
     </PreferenceCategory>
 
     <!--License-->

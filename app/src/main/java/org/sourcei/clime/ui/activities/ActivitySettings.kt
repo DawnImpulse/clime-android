@@ -16,10 +16,7 @@ import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.putAny
 import org.sourcei.clime.utils.functions.remove
 import org.sourcei.clime.utils.functions.toast
-import org.sourcei.clime.utils.reusables.ANALYTICS
-import org.sourcei.clime.utils.reusables.AUTO_WALLPAPER
-import org.sourcei.clime.utils.reusables.CRASHLYTICS
-import org.sourcei.clime.utils.reusables.Prefs
+import org.sourcei.clime.utils.reusables.*
 import org.sourcei.clime.workers.AutoWallpaper
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -28,10 +25,10 @@ import java.util.concurrent.TimeUnit
  * @author Saksham
  *
  * @note Last Branch Update - develop
- * @note Created on 2019-07 by Saksham
+ * @note Created on 2019-09-21 by Saksham
  *
  * @note Updates :
- *  Saksham - 2019 09 02 - develop - clear cache on search term change + cache options
+ *  Saksham - 2019 09 22 - master - changing temperature units
  */
 class ActivitySettings : AppCompatActivity() {
 
@@ -47,12 +44,13 @@ class ActivitySettings : AppCompatActivity() {
     }
 
     // attaching preferences
-    class MySettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener {
+    class MySettingsFragment : PreferenceFragmentCompat(), Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
 
         private lateinit var wallStatus: SwitchPreference
         private lateinit var wallWifi: SwitchPreference
         private lateinit var crashlytics: SwitchPreference
         private lateinit var analytics: SwitchPreference
+        private lateinit var units: Preference
 
         // set preference layout
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -63,13 +61,22 @@ class ActivitySettings : AppCompatActivity() {
             wallWifi = findPreference("wallWifi")!!
             crashlytics = findPreference("crashlytics")!!
             analytics = findPreference("analytics")!!
+            units = findPreference("units")!!
 
             // setting application version
             findPreference<Preference>("version")!!.summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
 
+            // set units
+            if (Prefs.getString(UNITS, METRIC) == IMPERIAL) {
+                units.summary = "Imperial (°F) / Wind (Mph)"
+            } else {
+                units.summary = "Metric (°C) / Wind (Kmph)"
+            }
+
             // listeners
             wallStatus.onPreferenceChangeListener = this
             wallWifi.onPreferenceChangeListener = this
+            units.onPreferenceClickListener = this
 
         }
 
@@ -96,14 +103,21 @@ class ActivitySettings : AppCompatActivity() {
                     setWallpaper()
                 }
 
-                // crashlytics
-                crashlytics -> Prefs.putAny(CRASHLYTICS, newValue as Boolean)
-
-                // analytics
-                analytics -> Prefs.putAny(ANALYTICS, newValue as Boolean)
-
             }
 
+            return true
+        }
+
+        // on preference click
+        override fun onPreferenceClick(preference: Preference?): Boolean {
+            val unit = Prefs.getString(UNITS, METRIC)
+            if (unit == METRIC) {
+                Prefs.putAny(UNITS, IMPERIAL)
+                units.summary = "Imperial (°F) / Wind (Mph)"
+            } else {
+                Prefs.putAny(UNITS, METRIC)
+                units.summary = "Metric (°C) / Wind (Kmph)"
+            }
             return true
         }
 

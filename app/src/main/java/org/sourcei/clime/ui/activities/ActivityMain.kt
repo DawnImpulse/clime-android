@@ -44,7 +44,7 @@ import java.io.File
  *  Saksham - 2019 09 22 - master - user provided location handling
  */
 @SuppressLint("SetTextI18n")
-class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,View.OnClickListener {
+class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     private lateinit var location: LatLng
     private lateinit var model: Model
     private var bitmap: Bitmap? = null
@@ -68,7 +68,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,V
 
     // on click listener
     override fun onClick(v: View) {
-        when(v.id){
+        when (v.id) {
             settings.id -> openActivity(ActivitySettings::class.java)
             gps.id -> openActivity(ActivityPlace::class.java)
         }
@@ -165,12 +165,23 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,V
             }
             r?.let {
                 details.show()
+
+                val t: String
+                val wi: String
+
+                if (Prefs.getString(UNITS, METRIC) == METRIC) {
+                    t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                    wi = it.wind.speed.toDouble().round(1).toString() + "  winds (k/h)"
+                } else {
+                    t = "${F.toFarenheit(it.main.temp.toFloat())}°F"
+                    wi = F.toMiles(it.wind.speed) + "  winds (m/h)"
+                }
+
+
                 val p = "${it.name}, ${it.sys.country}"
-                val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
                 val w = it.weather[0].description.toCamelCase()
                 val h = it.main.humidity
                 val c = it.clouds.all
-                val wi = it.wind.speed.toDouble().round(1).toString()
 
 
                 place.text = Prefs.getString(PLACE, p)
@@ -178,7 +189,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,V
                 weather.text = w
                 humid.text = "$h%  humidity"
                 clouds.text = "$c%  clouds"
-                wind.text = "${wi}    winds (k/h)"
+                wind.text = wi
 
                 Prefs.putAny(WEATHER, w)
                 Prefs.putAny(TEMPERATURE, t)
@@ -231,7 +242,7 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,V
         weather.text = w
         humid.text = "$h%  humidity"
         clouds.text = "$c%  cloud Cover"
-        wind.text = "${wi}    winds (k/h)"
+        wind.text = wi
 
         gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
 

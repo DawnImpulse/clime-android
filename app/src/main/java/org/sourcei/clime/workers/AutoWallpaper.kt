@@ -69,11 +69,20 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                 }
                 r?.let {
 
-                    val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                    val t:String
+                    val wi:String
+
+                    if (Prefs.getString(UNITS, METRIC) == METRIC) {
+                        t = "${F.toCelsius(it.main.temp.toFloat())}°C"
+                        wi = it.wind.speed.toDouble().round(1).toString() + "  winds (k/h)"
+                    } else {
+                        t = "${F.toFarenheit(it.main.temp.toFloat())}°F"
+                        wi = F.toMiles(it.wind.speed) + "  winds (m/h)"
+                    }
+
                     val w = it.weather[0].description.toCamelCase()
                     val h = it.main.humidity
                     val c = it.clouds.all
-                    val wi = it.wind.speed
 
                     Prefs.putAny(WEATHER, w)
                     Prefs.putAny(TEMPERATURE, t)
