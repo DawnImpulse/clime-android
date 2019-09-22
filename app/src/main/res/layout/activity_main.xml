@@ -22,11 +22,13 @@ OR PERFORMANCE OF THIS SOFTWARE.
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--Gradient-->
         <FrameLayout
             android:id="@+id/gradient"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!--Image-->
         <ImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
@@ -34,6 +36,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
             android:scaleType="centerCrop"
             android:visibility="gone" />
 
+        <!--Mask-->
         <FrameLayout
             android:id="@+id/mask"
             android:layout_width="match_parent"
@@ -42,6 +45,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
             android:background="@color/black"
             android:visibility="visible" />
 
+        <!--Place-->
         <TextView
             android:id="@+id/place"
             android:layout_width="match_parent"
@@ -52,6 +56,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
             android:textColor="@color/white"
             android:textStyle="bold" />
 
+        <!--Weather-->
         <TextView
             android:id="@+id/weather"
             android:layout_width="wrap_content"
@@ -63,6 +68,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
             android:textColor="@color/white"
             android:textStyle="bold" />
 
+        <!--Temp-->
         <TextView
             android:id="@+id/temperature"
             android:layout_width="wrap_content"
@@ -72,14 +78,105 @@ OR PERFORMANCE OF THIS SOFTWARE.
             android:textColor="@color/white"
             android:textSize="64sp" />
 
+        <!--Settings-->
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/settings"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentRight="true"
             android:layout_alignParentBottom="true"
             android:layout_margin="16dp"
             app:srcCompat="@drawable/vd_settings" />
+
+        <!--GPS-->
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/gps"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp"
+            android:layout_toLeftOf="@id/settings"
+            app:srcCompat="@drawable/vd_gps"
+            app:tint="@color/white" />
+
+        <!--Details-->
+        <LinearLayout
+            android:id="@+id/details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!--humid-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/vd_humid" />
+
+                <TextView
+                    android:id="@+id/humid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!--clouds-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/vd_cloud" />
+
+                <TextView
+                    android:id="@+id/clouds"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!--wind-->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    app:srcCompat="@drawable/vd_windy" />
+
+                <TextView
+                    android:id="@+id/wind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="16dp"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+        </LinearLayout>
     </RelativeLayout>
 
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

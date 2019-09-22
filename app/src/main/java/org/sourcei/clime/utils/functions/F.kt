@@ -173,6 +173,12 @@ object F {
         return ((temp - 273) * 1.8 + 32).round(1).toFloat()
     }
 
+    // convert speed to miles
+    fun toMiles(speed: String): String {
+        val s = speed.toDouble()
+        return (s / 1.609).round(1).toString()
+    }
+
     // search term for wallpaper
     fun getSearchTerm(icon: String): String {
         return when (icon) {
@@ -207,7 +213,15 @@ object F {
                 val geocoder = Geocoder(context)
                 val address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
 
-                callback("${address[0].locality}, ${address[0].countryCode.toUpperCase()}")
+                val locality = address[0].locality
+                val country = address[0].countryName
+                val code = address[0].countryCode
+
+                if (locality != null && locality != "null")
+                    callback("${locality}, $code")
+                else
+                    callback(country)
+
                 DialogHandler.dismiss()
 
             } catch (e: Exception) {
@@ -224,7 +238,14 @@ object F {
             val geocoder = Geocoder(context)
             val address = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1)
 
-            "${address[0].locality},${address[0].countryCode.toUpperCase()}"
+            val locality = address[0].locality
+            val country = address[0].countryName
+            val code = address[0].countryCode
+
+            return if (locality != null && locality != "null")
+                "${locality}, $code"
+            else
+                country
 
         } catch (e: Exception) {
             e.printStackTrace()

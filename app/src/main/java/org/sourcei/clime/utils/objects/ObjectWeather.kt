@@ -26,22 +26,34 @@ import com.google.gson.annotations.SerializedName
  * @note Updates :
  */
 data class ObjectWeather(
-    @SerializedName("weather") val weather: List<Weather>,
-    @SerializedName("main") val main: Main,
-    @SerializedName("sys") val sys: Sys,
-    @SerializedName("name") val name: String
+        @SerializedName("weather") val weather: List<Weather>,
+        @SerializedName("main") val main: Main,
+        @SerializedName("sys") val sys: Sys,
+        @SerializedName("name") val name: String,
+        @SerializedName("clouds") val clouds: Clouds,
+        @SerializedName("wind") val wind: Wind
 )
 
 data class Weather(
-    @SerializedName("main") val main: String,
-    @SerializedName("description") val description: String,
-    @SerializedName("icon") val icon: String
+        @SerializedName("main") val main: String,
+        @SerializedName("description") val description: String,
+        @SerializedName("icon") val icon: String
 )
 
 data class Main(
-    @SerializedName("temp") val temp: String
+        @SerializedName("temp") val temp: String,
+        @SerializedName("humidity") val humidity: String
 )
 
 data class Sys(
-    @SerializedName("country") val country: String
+        @SerializedName("country") val country: String
 )
+
+data class Clouds(
+        @SerializedName("all") val all: String
+)
+
+data class Wind(
+        @SerializedName("speed") val speed: String
+)
+

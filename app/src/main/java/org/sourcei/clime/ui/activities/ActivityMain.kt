@@ -18,6 +18,7 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.gms.maps.model.LatLng
@@ -43,7 +44,7 @@ import java.io.File
  *  Saksham - 2019 09 22 - master - user provided location handling
  */
 @SuppressLint("SetTextI18n")
-class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
+class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,View.OnClickListener {
     private lateinit var location: LatLng
     private lateinit var model: Model
     private var bitmap: Bitmap? = null
@@ -61,7 +62,16 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
             setAvailableData()
 
         swipe.setOnRefreshListener(this)
-        settings.setOnClickListener { openActivity(ActivitySettings::class.java) }
+        settings.setOnClickListener(this)
+        gps.setOnClickListener(this)
+    }
+
+    // on click listener
+    override fun onClick(v: View) {
+        when(v.id){
+            settings.id -> openActivity(ActivitySettings::class.java)
+            gps.id -> openActivity(ActivityPlace::class.java)
+        }
     }
 
     // on resume
@@ -154,17 +164,27 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 swipe.isRefreshing = false
             }
             r?.let {
+                details.show()
                 val p = "${it.name}, ${it.sys.country}"
                 val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
                 val w = it.weather[0].description.toCamelCase()
+                val h = it.main.humidity
+                val c = it.clouds.all
+                val wi = it.wind.speed.toDouble().round(1).toString()
 
 
                 place.text = Prefs.getString(PLACE, p)
                 temperature.text = t
                 weather.text = w
+                humid.text = "$h%  humidity"
+                clouds.text = "$c%  clouds"
+                wind.text = "${wi}    winds (k/h)"
 
                 Prefs.putAny(WEATHER, w)
                 Prefs.putAny(TEMPERATURE, t)
+                Prefs.putAny(HUMIDITY, h)
+                Prefs.putAny(CLOUDS, c)
+                Prefs.putAny(WIND, wi)
                 Prefs.putAny(LATLON, Gson().toJson(location))
                 Prefs.putAny(ICON, it.weather[0].icon)
 
@@ -193,15 +213,25 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     // set stored data
     private fun setAvailableData() {
+
+        details.show()
+
         val p = Prefs.getString(PLACE, "Somewhere on Earth")!!
         val t = Prefs.getString(TEMPERATURE, "")!!
         val w = Prefs.getString(WEATHER, "")!!
         val i = Prefs.getString(ICON, "")!!
+        val h = Prefs.getString(HUMIDITY, "")!!
+        val c = Prefs.getString(CLOUDS, "")!!
+        val wi = Prefs.getString(WIND, "")!!
+
         location = Gson().fromJson(Prefs.getString(LATLON, ""), LatLng::class.java)
 
         place.text = p
         temperature.text = t
         weather.text = w
+        humid.text = "$h%  humidity"
+        clouds.text = "$c%  cloud Cover"
+        wind.text = "${wi}    winds (k/h)"
 
         gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
 

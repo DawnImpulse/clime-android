@@ -71,9 +71,15 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
 
                     val t = "${F.toCelsius(it.main.temp.toFloat())}°C"
                     val w = it.weather[0].description.toCamelCase()
+                    val h = it.main.humidity
+                    val c = it.clouds.all
+                    val wi = it.wind.speed
 
                     Prefs.putAny(WEATHER, w)
                     Prefs.putAny(TEMPERATURE, t)
+                    Prefs.putAny(HUMIDITY, h)
+                    Prefs.putAny(CLOUDS, c)
+                    Prefs.putAny(WIND, wi)
 
                     // only change wallpaper if there is change in condition (icon change)
                     if (Prefs.getString(ICON, "") == it.weather[0].icon && Prefs.contains(WALL_CHANGED))
@@ -103,6 +109,4 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                 callback(false)
         }
     }
-
-
 }
