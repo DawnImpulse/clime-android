@@ -36,16 +36,6 @@
             android:title="Only WiFi"
             app:iconSpaceReserved="true" />
 
-        <!--Change toast-->
-        <SwitchPreference
-            android:defaultValue="true"
-            android:dependency="wallStatus"
-            android:key="showToast"
-            android:summaryOff="Not showing toast on Auto wallpaper change"
-            android:summaryOn="Showing toast whenever Auto wallpaper changes"
-            android:title="Show Toast"
-            app:iconSpaceReserved="true" />
-
         <!--OEM Setting-->
         <Preference
             android:dependency="wallStatus"

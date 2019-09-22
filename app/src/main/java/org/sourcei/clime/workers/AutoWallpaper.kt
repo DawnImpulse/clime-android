@@ -25,10 +25,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.gson.Gson
 import org.sourcei.clime.network.Repo
-import org.sourcei.clime.utils.functions.F
-import org.sourcei.clime.utils.functions.loge
-import org.sourcei.clime.utils.functions.putAny
-import org.sourcei.clime.utils.functions.toCamelCase
+import org.sourcei.clime.utils.functions.*
 import org.sourcei.clime.utils.handler.ImageHandler
 import org.sourcei.clime.utils.reusables.*
 
@@ -80,10 +77,11 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
                     Prefs.putAny(TEMPERATURE, t)
 
                     // only change wallpaper if there is change in condition (icon change)
-                    if (Prefs.getString(ICON, "") == it.weather[0].icon)
+                    if (Prefs.getString(ICON, "") == it.weather[0].icon && Prefs.contains(WALL_CHANGED))
                         callback(true)
                     else {
                         Prefs.putAny(ICON, it.weather[0].icon)
+                        Prefs.putAny(WALL_CHANGED, true)
                         wallpaperChange(callback)
                     }
                 }
@@ -98,6 +96,9 @@ class AutoWallpaper(private val appContext: Context, workerParams: WorkerParamet
         ImageHandler.getBitmapWallpaper(appContext) {
             if (it != null) {
                 wallpaperManager.setBitmap(it)
+                handler.post {
+                    appContext.toast("wallpaper changed")
+                }
                 callback(true)
             } else
                 callback(false)

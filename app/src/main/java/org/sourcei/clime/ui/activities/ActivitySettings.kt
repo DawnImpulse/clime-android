@@ -82,7 +82,7 @@ class ActivitySettings : AppCompatActivity() {
                     // if wallpaper enables
                     if (newValue) {
                         setWallpaper()
-                        context!!.toast("Wallpaper will start changing after every 30 minute interval based on current weather. Will stay the same if there is no change in weather condition. Also note the wallpaper will only change once you have set a location in the app.", Toast.LENGTH_LONG)
+                        context!!.toast("Wallpaper will change after 30 minute interval based on weather. Will stay the same if there is no change in weather condition.", Toast.LENGTH_LONG)
                     } else {
                         // wallpaper disabled
                         WorkManager.getInstance(context!!).cancelWorkById(UUID.fromString(Prefs.getString(AUTO_WALLPAPER, "")))

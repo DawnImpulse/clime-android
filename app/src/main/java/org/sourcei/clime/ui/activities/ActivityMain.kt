@@ -15,7 +15,6 @@
 package org.sourcei.clime.ui.activities
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -42,6 +41,7 @@ import java.io.File
  *
  * @note Created on 2019-09-21 by Saksham
  * @note Updates :
+ *  Saksham - 2019 09 22 - master - user provided location handling
  */
 @SuppressLint("SetTextI18n")
 class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
@@ -70,33 +70,37 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         super.onResume()
 
         if (Prefs.contains(NEWLATLON)) {
-            val new = Gson().fromJson(NEWLATLON, LatLng::class.java)
+            val new = Gson().fromJson(Prefs.getString(NEWLATLON, ""), LatLng::class.java)
             if (::location.isInitialized) {
                 if (location.latitude != new.latitude || location.longitude != new.longitude) {
+                    swipe.isRefreshing = true
                     location = new
                     setData()
+                    Prefs.remove(WALL_CHANGED)
                 }
             } else {
+                swipe.isRefreshing = true
                 location = new
                 setData()
+                Prefs.remove(WALL_CHANGED)
             }
+        }
+
+        // if don't get location the first time even
+        if (!::location.isInitialized) {
+            toast(
+                "unable to get location, kindly provide your location in Settings",
+                Toast.LENGTH_LONG
+            )
+            swipe.isRefreshing = false
         }
     }
 
-    // set activity result (for location)
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
+    // remove newlatlon
+    override fun onDestroy() {
+        super.onDestroy()
 
-        if (requestCode == 1) {
-            if (resultCode == Activity.RESULT_OK) {
-                val location = Gson().fromJson(data!!.data.toString(), LatLng::class.java)
-                this.location = location
-                setData()
-            } else {
-                toast("unable to get location, kindly provide your location in Settings", Toast.LENGTH_LONG)
-                swipe.isRefreshing = false
-            }
-        }
+        Prefs.remove(NEWLATLON)
     }
 
     // swipe refresh listener
@@ -107,28 +111,37 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
 
     // handle stored data / ask for location & data
     private fun dataHandling(current: Boolean = false) {
-        Permissions.askAccessCoarseLocationPermission(this) { e, r ->
-            e?.let {
-                toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
-                swipe.isRefreshing = false
-            }
-            r?.let {
 
-                fun handling(latLng: LatLng?) {
-                    if (latLng != null) {
-                        location = latLng
-                        logd(location.toString())
-                        setData()
-                    } else
-                        startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
+        // if user location is present then use it
+        if (Prefs.contains(USER_LOCATION)) {
+            location = Gson().fromJson(Prefs.getString(USER_LOCATION, ""), LatLng::class.java)
+            setData()
+        } else
+        // ask for location permission
+            Permissions.askAccessCoarseLocationPermission(this) { e, r ->
+                e?.let {
+                    // start place activity
+                    swipe.isRefreshing = false
+                    startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
                 }
+                r?.let {
+                    // if location permission available then get user location
+                    Prefs.remove(USER_LOCATION)
 
-                if (current)
-                    F.getCurrentLocation(this) { handling(it) }
-                else
-                    F.getLocation(this) { handling(it) }
+                    fun handling(latLng: LatLng?) {
+                        if (latLng != null) {
+                            location = latLng
+                            setData()
+                        } else
+                            startActivityForResult(Intent(this, ActivityPlace::class.java), 1)
+                    }
+
+                    if (current)
+                        F.getCurrentLocation(this) { handling(it) }
+                    else
+                        F.getLocation(this) { handling(it) }
+                }
             }
-        }
     }
 
     // set new data
@@ -155,7 +168,11 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
                 Prefs.putAny(LATLON, Gson().toJson(location))
                 Prefs.putAny(ICON, it.weather[0].icon)
 
-                gradient.setGradient(Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(), 0, Angles.random().toFloat())
+                gradient.setGradient(
+                    Gradients.getWeatherGradients(it.weather[0].icon).toIntArray(),
+                    0,
+                    Angles.random().toFloat()
+                )
                 swipe.isRefreshing = false
 
                 // set image
@@ -186,7 +203,11 @@ class ActivityMain : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener {
         temperature.text = t
         weather.text = w
 
-        gradient.setGradient(Gradients.getWeatherGradients(i).toIntArray(), 0, Angles.random().toFloat())
+        gradient.setGradient(
+            Gradients.getWeatherGradients(i).toIntArray(),
+            0,
+            Angles.random().toFloat()
+        )
         if (File(cacheDir, "homescreen.jpg").exists()) {
             bitmap = StorageHandler.getBitmapFromFile(File(cacheDir, "homescreen.jpg"))
             image.setImageBitmap(bitmap)

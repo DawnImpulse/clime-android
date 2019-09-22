@@ -14,6 +14,7 @@
  **/
 package org.sourcei.clime.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -29,10 +30,7 @@ import kotlinx.android.synthetic.main.activity_place.*
 import org.sourcei.android.permissions.Permissions
 import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.*
-import org.sourcei.clime.utils.reusables.Angles
-import org.sourcei.clime.utils.reusables.Gradients
-import org.sourcei.clime.utils.reusables.NEWLATLON
-import org.sourcei.clime.utils.reusables.Prefs
+import org.sourcei.clime.utils.reusables.*
 
 /**
  * @info -
@@ -59,7 +57,7 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
         // init places autocomplete
         placesClient = Places.createClient(this)
         autocompleteFragment = searchPlace as AutocompleteSupportFragment
-        autocompleteFragment.setPlaceFields(listOf(Place.Field.ID, Place.Field.NAME))
+        autocompleteFragment.setPlaceFields(listOf(Place.Field.LAT_LNG))
 
         autocompleteFragment.setOnPlaceSelectedListener(this)
         gps.setOnClickListener(this)
@@ -72,11 +70,12 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
                 toast("permission denied, kindly provide location permission to get current location for weather data. Will only be used once (only now)", Toast.LENGTH_LONG)
             }
             r?.let {
-                F.getLocation(this) {
+                F.getCurrentLocation(this) {
                     if (it == null)
                         toast("location not available, enable your device gps/internet then try again. Alternatively you can search for your city", Toast.LENGTH_LONG)
                     else {
                         Prefs.putAny(NEWLATLON, Gson().toJson(it))
+                        Prefs.remove(USER_LOCATION)
                         finish()
                     }
                 }
@@ -86,7 +85,10 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
 
     // on place selected
     override fun onPlaceSelected(place: Place) {
+
+        logd(Gson().toJson(place))
         Prefs.putAny(NEWLATLON, Gson().toJson(place.latLng))
+        Prefs.putAny(USER_LOCATION, Gson().toJson(place.latLng))
         finish()
     }
 
@@ -94,5 +96,9 @@ class ActivityPlace : AppCompatActivity(), PlaceSelectionListener, View.OnClickL
     override fun onError(status: Status) {
         loge("An error occurred: $status")
         toast("error occurred while selecting place. Please try again")
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }

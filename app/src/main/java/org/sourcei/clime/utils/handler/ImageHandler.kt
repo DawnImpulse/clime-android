@@ -77,7 +77,7 @@ object ImageHandler {
                 .skipMemoryCache(true)
                 .submit()
 
-            (context as AppCompatActivity).runOnUiThread { callback(future.get()) }
+            callback(future.get())
         }
     }
 }
