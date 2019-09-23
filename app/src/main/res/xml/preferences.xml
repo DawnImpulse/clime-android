@@ -41,8 +41,8 @@
             android:defaultValue="false"
             android:dependency="wallStatus"
             android:key="wallWifi"
-            android:summaryOff="Will use any network type to cache images &amp; set wallpaper"
-            android:summaryOn="Will use only WiFi to cache images &amp; set wallpaper (even changing wallpaper won't work)"
+            android:summaryOff="Will use any network type to get weather condition &amp; set wallpaper"
+            android:summaryOn="Will use only WiFi to get weather condition &amp; set wallpaper"
             android:title="Only WiFi"
             app:iconSpaceReserved="true" />
 
@@ -70,6 +70,13 @@
             android:selectable="true"
             android:summary="Metric (°C) / Wind (Kmph)"
             android:title="Temperature / Wind Units" />
+
+        <!--Change Wallpaper-->
+        <Preference
+            android:key="wallpaper"
+            android:selectable="true"
+            android:summary="Tap to change wallpaper as per current weather condition"
+            android:title="Change Wallpaper" />
     </PreferenceCategory>
 
     <!--Services-->

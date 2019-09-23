@@ -1,7 +1,7 @@
 package org.sourcei.clime.ui.activities
 
+import android.app.WallpaperManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.Preference
@@ -11,11 +11,14 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.sourcei.clime.BuildConfig
 import org.sourcei.clime.R
 import org.sourcei.clime.utils.functions.putAny
 import org.sourcei.clime.utils.functions.remove
 import org.sourcei.clime.utils.functions.toast
+import org.sourcei.clime.utils.handler.ImageHandler
 import org.sourcei.clime.utils.reusables.*
 import org.sourcei.clime.workers.AutoWallpaper
 import java.util.*
@@ -29,6 +32,7 @@ import java.util.concurrent.TimeUnit
  *
  * @note Updates :
  *  Saksham - 2019 09 22 - master - changing temperature units
+ *  Saksham - 2019 09 23 - master - change wallpaper
  */
 class ActivitySettings : AppCompatActivity() {
 
@@ -52,6 +56,7 @@ class ActivitySettings : AppCompatActivity() {
         private lateinit var analytics: SwitchPreference
         private lateinit var change: SwitchPreference
         private lateinit var units: Preference
+        private lateinit var wallpaper: Preference
 
         // set preference layout
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -64,6 +69,7 @@ class ActivitySettings : AppCompatActivity() {
             analytics = findPreference("analytics")!!
             units = findPreference("units")!!
             change = findPreference("change")!!
+            wallpaper = findPreference("wallpaper")!!
 
             // setting application version
             findPreference<Preference>("version")!!.summary = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
@@ -78,8 +84,10 @@ class ActivitySettings : AppCompatActivity() {
             // listeners
             wallStatus.onPreferenceChangeListener = this
             wallWifi.onPreferenceChangeListener = this
-            units.onPreferenceClickListener = this
             change.onPreferenceChangeListener = this
+
+            units.onPreferenceClickListener = this
+            wallpaper.onPreferenceClickListener = this
 
         }
 
@@ -92,7 +100,6 @@ class ActivitySettings : AppCompatActivity() {
                     // if wallpaper enables
                     if (newValue) {
                         setWallpaper()
-                        context!!.toast("Wallpaper will change after 30 minute interval based on weather. Will stay the same if there is no change in weather condition.", Toast.LENGTH_LONG)
                     } else {
                         // wallpaper disabled
                         WorkManager.getInstance(context!!).cancelWorkById(UUID.fromString(Prefs.getString(AUTO_WALLPAPER, "")))
@@ -123,14 +130,38 @@ class ActivitySettings : AppCompatActivity() {
 
         // on preference click
         override fun onPreferenceClick(preference: Preference?): Boolean {
-            val unit = Prefs.getString(UNITS, METRIC)
-            if (unit == METRIC) {
-                Prefs.putAny(UNITS, IMPERIAL)
-                units.summary = "Imperial (°F) / Wind (Mph)"
-            } else {
-                Prefs.putAny(UNITS, METRIC)
-                units.summary = "Metric (°C) / Wind (Kmph)"
+            when (preference) {
+
+                units -> {
+                    val unit = Prefs.getString(UNITS, METRIC)
+                    if (unit == METRIC) {
+                        Prefs.putAny(UNITS, IMPERIAL)
+                        units.summary = "Imperial (°F) / Wind (Mph)"
+                    } else {
+                        Prefs.putAny(UNITS, METRIC)
+                        units.summary = "Metric (°C) / Wind (Kmph)"
+                    }
+                }
+
+                wallpaper -> {
+                    context!!.toast("changing wallpaper")
+                    GlobalScope.launch {
+                        ImageHandler.getBitmapWallpaper(context!!) {
+                            if (it != null) {
+                                WallpaperManager.getInstance(context).setBitmap(it)
+                                (context as AppCompatActivity).runOnUiThread {
+                                    context!!.toast("wallpaper changed successfully")
+                                }
+                            } else
+                                (context as AppCompatActivity).runOnUiThread {
+                                    context!!.toast("error changing wallpaper")
+                                }
+                        }
+                    }
+                }
             }
+
+
             return true
         }
 
@@ -145,7 +176,7 @@ class ActivitySettings : AppCompatActivity() {
 
             // get wifi & time
             val isWifi = Prefs.getBoolean("wallWifi", true)
-            val time = if (Prefs.getBoolean(CHANGE,true)) 60 else 30
+            val time = if (Prefs.getBoolean(CHANGE, true)) 60 else 30
 
 
             val builder = Constraints.Builder()
